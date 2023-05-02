@@ -161,7 +161,7 @@ class LitLLaMA(BaseLM):
         return self._device
 
     def tok_encode(self, string: str):
-        return self.tokenizer.encode(string).tolist()
+        return self.tokenizer.encode(string, bos=True, eos=False).tolist()
 
     def tok_decode(self, tokens):
         t = torch.tensor(tokens)
@@ -179,10 +179,6 @@ class LitLLaMA(BaseLM):
             return self.model(inps)
 
     def _model_generate(self, context, max_length, eos_token_id):
-        generation_kwargs = {'do_sample': False, 'max_length': max_length}
-        if eos_token_id is not None:
-            generation_kwargs['eos_token_id'] = eos_token_id
-
         encoded_context = tokenizer.encode(context, bos=True, eos=False, device=fabric.device)
         out = generate(
             model=model,
@@ -191,7 +187,7 @@ class LitLLaMA(BaseLM):
             max_seq_length=self.model.config.block_size,
             do_sample=self.do_sample,
             temperature=self.temperature,
-            top_k=1,
+            top_k=None,
             eos_id=eos_token_id,
         )
 
