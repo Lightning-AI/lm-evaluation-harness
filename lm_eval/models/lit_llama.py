@@ -153,6 +153,7 @@ class LitLLaMA(BaseLM):
     @property
     def batch_size(self):
         # TODO: fix multi-gpu
+        assert self.batch_size_per_gpu == 1
         return self.batch_size_per_gpu  # * gpus
 
     @property
@@ -161,7 +162,7 @@ class LitLLaMA(BaseLM):
         return self._device
 
     def tok_encode(self, string: str):
-        return self.tokenizer.encode(string, bos=True, eos=False).tolist()
+        return self.tokenizer.encode(string, bos=False, eos=False).tolist()
 
     def tok_decode(self, tokens):
         t = torch.tensor(tokens)
@@ -179,9 +180,9 @@ class LitLLaMA(BaseLM):
             return self.model(inps)
 
     def _model_generate(self, context, max_length, eos_token_id):
-        encoded_context = tokenizer.encode(context, bos=True, eos=False, device=fabric.device)
+        encoded_context = self.tok_encode(context)
         out = generate(
-            model=model,
+            model=self.model,
             idx=encoded_context,
             max_new_tokens=max_length,
             max_seq_length=self.model.config.block_size,
