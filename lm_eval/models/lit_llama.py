@@ -180,10 +180,10 @@ class LitLLaMA(BaseLM):
             return self.model(inps)
 
     def _model_generate(self, context, max_length, eos_token_id):
-        encoded_context = self.tok_encode(context)
+        assert context.shape[0] == 1
         out = generate(
             model=self.model,
-            idx=encoded_context,
+            idx=context[0],
             max_new_tokens=max_length,
             max_seq_length=self.model.config.block_size,
             do_sample=self.do_sample,
