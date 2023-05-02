@@ -3,6 +3,7 @@ from . import gpt3
 from . import huggingface
 from . import textsynth
 from . import dummy
+from . import lit_llama
 
 MODEL_REGISTRY = {
     "hf": gpt2.HFLM,
@@ -13,6 +14,7 @@ MODEL_REGISTRY = {
     "gpt3": gpt3.GPT3LM,
     "textsynth": textsynth.TextSynthLM,
     "dummy": dummy.DummyLM,
+    "lit-llama": lit_llama.LitLLaMA
 }
 
 
